@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Receta</title>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+        <script>
+            
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+        
+            let recetas = [] 
+            
+            if( localStorage.getItem('items')){
+                recetas =  JSON.parse(localStorage.getItem('items'));
+            }
+
+            let tempIngredients = [];
+            let i =  1;
+
+           
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+
+                recetas.push(
+                    {   
+                        id: i,
+                        nombre: e.target.nombre.value,
+                        tiempo: e.target.tiempo.value,
+                        ingredientes:tempIngredients,
+                        url:e.target.url.value
+                    }
+                );
+                
+                i++;
+                e.target.nombre.value='';
+                e.target.tiempo.value='';
+                e.target.url.value = ''
+                e.target.nombre.focus(); 
+
+               
+                tempIngredients = [];
+            
+                localStorage.setItem('items',"");
+                localStorage.setItem('items', JSON.stringify(recetas));
+
+                
+                renderlista();
+            }
+
+           
+            const saveIngredients = (e) => {
+                e.preventDefault();
+                tempIngredients.push(e.target.ingre.value);
+                e.target.ingre.value = '';
+            }
+
+            const form = React.createElement('form', {onSubmit:handleSubmit }, [
+                React.createElement('input',{type:'text',name:'nombre', placeholder:'Nombre'}),
+                React.createElement('input',{type:'text',name:'tiempo',placeholder:'Tiempo'}),
+                React.createElement('input',{type:'text',name:"url",placeholder:'Url Imagen'}),
+                React.createElement('button',{type: 'submit'},'Agregar Receta')
+            ]);
+
+            const formIngredients = React.createElement('form', {onSubmit:saveIngredients},[
+                React.createElement('input',{type:'text',name:'ingre', placeholder:'Nombre Ingrediente'}),
+                React.createElement('button',{type: 'submit'},'Add')
+            ]);
+            const renderlista = (array)=> {
+                const listaRecetas = recetas.map(receta => {
+                    console.log("Aquí ando mane");
+                    
+                    const ingredientes = receta.ingredientes.map((ingrediente, index) => (
+                        React.createElement('li', { key: index }, ingrediente)
+                    ));
+
+                    return (
+                        React.createElement('div', receta.id,
+                            React.createElement('h2', null, receta.nombre),
+                            React.createElement('h3', null, receta.tiempo),
+                            React.createElement('h3', null, 'Ingredientes:'),
+                            React.createElement('ul', null, ingredientes),
+                            React.createElement('img',{src:receta.url},null),
+                            React.createElement('hr',null,null)
+                        )
+                    );
+                });
+
+                root.render([form,formIngredients,listaRecetas]);
+            }
+
+
+            renderlista();
+
+        </script>
+    </body>
+</html>
